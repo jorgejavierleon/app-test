@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
 
 class Subscriber extends Model
 {
@@ -33,5 +34,13 @@ class Subscriber extends Model
     public function hasVerifiedEmail() : bool
     {
         return !!$this->email_verified_at;
+    }
+
+    public function signedVerificationEmailUrl() : string 
+    {
+        return URL::temporarySignedRoute('verify', now()->addDay(), [
+            'subscriber' => $this->id,
+            'email' => $this->email,
+        ]);
     }
 }

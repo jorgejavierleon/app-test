@@ -4,10 +4,12 @@ namespace Tests\Feature;
 
 use App\Http\Livewire\LandingSubscribers;
 use App\Http\Livewire\SubscribersForm;
+use App\Mail\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
 
 class SubscribersTest extends TestCase
@@ -96,6 +98,7 @@ class SubscribersTest extends TestCase
     {
         Mail::fake();
         $subscriber_data = Subscriber::factory()->make(['firstname' => 'Pedrossd']);
+        $this->withoutExceptionHandling();
         
         Livewire::test(LandingSubscribers::class)
             ->set('firstname', $subscriber_data->firstname)        
@@ -110,8 +113,23 @@ class SubscribersTest extends TestCase
         $this->assertFalse($created_subscriber->hasVerifiedEmail());
 
         //An email is sent
-        Mail::assertSent(ValidateEmail::class, function($email) use ($created_subscriber){
+        Mail::assertQueued(VerifyEmail::class, function($email) use ($created_subscriber){
             return $email->hasTo($created_subscriber->email);
         });
+    }
+
+    /**
+     * @test
+     */
+    public function an_email_can_be_verified()
+    {
+        $subscriber = Subscriber::factory()->create([
+            'email_verified_at' => null,
+        ]);
+        $verificationUrl = $subscriber->signedVerificationEmailUrl();
+        $response = $this->get($verificationUrl);
+        $response->assertSee($subscriber->email);
+
+        $this->assertTrue($subscriber->fresh()->hasVerifiedEmail());
     }
 }

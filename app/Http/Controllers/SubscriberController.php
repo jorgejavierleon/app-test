@@ -45,9 +45,11 @@ class SubscriberController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function verifyEmail(Request $request)
     {
-        //
+        $subscriber = Subscriber::findOrFail($request->get('subscriber'));
+        $subscriber->update(['email_verified_at' => now()]);
+        return $subscriber->email . ' verify';
     }
 
     /**

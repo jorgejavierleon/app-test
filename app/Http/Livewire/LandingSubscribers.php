@@ -2,7 +2,9 @@
 
 namespace App\Http\Livewire;
 
+use App\Mail\VerifyEmail;
 use App\Models\Subscriber;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Component;
 
 class LandingSubscribers extends Component
@@ -23,7 +25,7 @@ class LandingSubscribers extends Component
     {
         $this->validate(Subscriber::$rules);
 
-        Subscriber::create([
+        $subscriber = Subscriber::create([
             'firstname' => $this->firstname,
             'lastname' => $this->lastname,
             'email' => $this->email,
@@ -31,7 +33,7 @@ class LandingSubscribers extends Component
             'city' => $this->city,
             'country' => $this->country,
         ]);
-        
+        Mail::to($subscriber)->send(new VerifyEmail($subscriber)); 
         $this->resetForm();
         session()->flash('success_message', 'Form submited. We will send you a validation email');
     }

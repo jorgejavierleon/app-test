@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\SubscriberController;
+use App\Mail\VerifyEmail;
+use App\Models\Subscriber;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -27,6 +29,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('admin/subscribers/{subscriber}', [SubscriberController::class, 'edit'])
         ->name('subscribers.edit');
 });
+
+Route::get('mailable', function () {
+    $subscriber = Subscriber::first();
+    return new VerifyEmail($subscriber);
+});
+
+Route::get('verify', [SubscriberController::class, 'verifyEmail'])
+    ->middleware('signed')->name('verify');
 
 require __DIR__.'/auth.php';
 
