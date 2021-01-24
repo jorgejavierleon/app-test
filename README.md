@@ -29,4 +29,5 @@
 ## Info
 - The seeders run in 44 seconds and create 300.000 subscribers
 - To see the verification email for the first subscriber in DB go to /mailable
+- For the queue jobs I'm using predis. It needs to be installed in order to run the worker with php artisan horizon
 
