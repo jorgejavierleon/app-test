@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Exports\SubscribersExport;
 use App\Http\Livewire\LandingSubscribers;
 use App\Http\Livewire\SubscribersForm;
 use App\Mail\VerifyEmail;
@@ -9,8 +10,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
 use Livewire\Livewire;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SubscribersTest extends TestCase
 {
@@ -94,6 +95,18 @@ class SubscribersTest extends TestCase
     /**
      * @test
      */
+    public function an_admin_can_download_all_subscribers_in_csv()
+    {
+        Excel::fake();
+        $this->withoutExceptionHandling();
+        Subscriber::factory(2)->create(['firstname' => 'pedeross']);
+        $this->actingAsAdmin()->get('admin/subscribers/download');
+        Excel::assertDownloaded('subscribers.csv');
+    }
+
+    /**
+     * @test
+     */
     public function a_guest_can_subscribe()
     {
         Mail::fake();
@@ -121,7 +134,7 @@ class SubscribersTest extends TestCase
     /**
      * @test
      */
-    public function an_email_can_be_verified()
+    public function an_email_can_be_verified_by_the_subscriber()
     {
         $subscriber = Subscriber::factory()->create([
             'email_verified_at' => null,

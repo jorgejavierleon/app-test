@@ -19,10 +19,11 @@
 - [] Make and API for the users resource
 - [] Document the api with postmant
 - [] Add meta data to user model for custom fields
-- [] Add CRUD for products
+- [] Add CRUD for products (optional)
 - [x] Make the website 
 - [x] Make the subscription endpoint
-- [] Make the validation email template
+- [x] Make the validation email template
+- [x] Send email in a queue job with redis
 - [] Documentation to run the app
 - [] Documentations of work done
 

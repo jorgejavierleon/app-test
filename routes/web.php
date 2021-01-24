@@ -21,20 +21,23 @@ Route::get('/', function () {
 });
 //Admin Routes
 Route::middleware(['auth'])->group(function () {
-
     Route::get('admin/subscribers', [SubscriberController::class, 'index'])
         ->name('subscribers');
+    Route::get('admin/subscribers/download', [SubscriberController::class, 'export'])
+        ->name('subscribers.download');
     Route::get('admin/subscribers/create', [SubscriberController::class, 'create'])
         ->name('subscribers.create');
     Route::get('admin/subscribers/{subscriber}', [SubscriberController::class, 'edit'])
         ->name('subscribers.edit');
 });
 
+//To see the email tamplate
 Route::get('mailable', function () {
     $subscriber = Subscriber::first();
     return new VerifyEmail($subscriber);
 });
 
+//Verify the email
 Route::get('verify', [SubscriberController::class, 'verifyEmail'])
     ->middleware('signed')->name('verify');
 
