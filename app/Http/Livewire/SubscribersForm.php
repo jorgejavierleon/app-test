@@ -17,14 +17,6 @@ class SubscribersForm extends Component
     public $city;
     public $country;
 
-    
-    protected $rules = [
-        'firstname' => 'required|string',
-        'lastname' => 'required|string',
-        'email' => 'required|email|unique:subscribers',
-        'city' => 'required|string',
-        'country' => 'required|string',
-    ];
 
     public function mount()
     {
@@ -48,7 +40,7 @@ class SubscribersForm extends Component
 
     public function storeSubscriber()
     {
-        $this->validate();
+        $this->validate(Subscriber::$rules);
 
         Subscriber::create([
             'firstname' => $this->firstname,
@@ -69,7 +61,7 @@ class SubscribersForm extends Component
         if(!$this->subscriber){
             return;
         }
-        $update_rules = $this->rules;
+        $update_rules = Subscriber::$rules;
         $update_rules['email'] = 'required|email|unique:subscribers,email,'. $this->subscriber->id;
         $this->validate($update_rules);
 

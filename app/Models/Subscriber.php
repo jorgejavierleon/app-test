@@ -11,14 +11,27 @@ class Subscriber extends Model
 
     protected $guarded = [];
 
+    public static $rules = [
+        'firstname' => 'required|string',
+        'lastname' => 'required|string',
+        'email' => 'required|email|unique:subscribers',
+        'city' => 'required|string',
+        'country' => 'required|string',
+    ];
+
     /**
      * Get the subscriber's full name.
      *
      * @param  string  $value
      * @return string
      */
-    public function getFullNameAttribute()
+    public function getFullNameAttribute() : string
     {
         return ucfirst($this->firstname) . ' ' . ucfirst($this->lastname);
+    }
+
+    public function hasVerifiedEmail() : bool
+    {
+        return !!$this->email_verified_at;
     }
 }

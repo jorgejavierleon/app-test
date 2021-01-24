@@ -8,11 +8,11 @@
 </p>
 
 ## Steps
-- [] Estimation 
+- [x] Estimation 
 - [x] Install laravel v.8
 - [x] Do the authentication process
-- [] Admin layout
-- [] Manage users with CRUD in the admin panel
+- [x] Admin layout
+- [x] Manage subscribers with CRUD in the admin panel
 - [] Import and export csv of users in admin panel
 - [] Import and export csv via cli
 - [] Add support for heavy load with PHP generators lazycollections
@@ -20,12 +20,14 @@
 - [] Document the api with postmant
 - [] Add meta data to user model for custom fields
 - [] Add CRUD for products
-- [] Make the website 
-- [] Make the subscription endpoint
+- [x] Make the website 
+- [x] Make the subscription endpoint
 - [] Make the validation email template
 - [] Documentation to run the app
 - [] Documentations of work done
 
+## Info
+- The seeders run in 44 seconds and create 300.000 subscribers
 
 ## About Laravel
 

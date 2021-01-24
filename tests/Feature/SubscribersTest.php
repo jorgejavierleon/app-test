@@ -2,10 +2,12 @@
 
 namespace Tests\Feature;
 
+use App\Http\Livewire\LandingSubscribers;
 use App\Http\Livewire\SubscribersForm;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Subscriber;
+use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
 class SubscribersTest extends TestCase
@@ -85,5 +87,31 @@ class SubscribersTest extends TestCase
             ->call('deleteSubscriber');        
 
         $this->assertFalse(Subscriber::whereId($subscriber->id)->exists());
+    }
+
+    /**
+     * @test
+     */
+    public function a_guest_can_subscribe()
+    {
+        Mail::fake();
+        $subscriber_data = Subscriber::factory()->make(['firstname' => 'Pedrossd']);
+        
+        Livewire::test(LandingSubscribers::class)
+            ->set('firstname', $subscriber_data->firstname)        
+            ->set('lastname', $subscriber_data->lastname)        
+            ->set('email', $subscriber_data->email)        
+            ->set('city', $subscriber_data->city)
+            ->set('country', $subscriber_data->country)
+            ->call('storeSubscriber');        
+
+        $this->assertTrue(Subscriber::whereFirstname('Pedrossd')->exists());
+        $created_subscriber = Subscriber::whereFirstname('Pedrossd')->first();
+        $this->assertFalse($created_subscriber->hasVerifiedEmail());
+
+        //An email is sent
+        Mail::assertSent(ValidateEmail::class, function($email) use ($created_subscriber){
+            return $email->hasTo($created_subscriber->email);
+        });
     }
 }
