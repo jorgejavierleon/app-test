@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\SubscribersExport;
 use App\Models\Subscriber;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SubscriberController extends Controller
 {
@@ -39,10 +41,9 @@ class SubscriberController extends Controller
     }
 
     /**
-     * Update the specified resource in storage.
+     * Verify the email
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function verifyEmail(Request $request)
@@ -50,6 +51,47 @@ class SubscriberController extends Controller
         $subscriber = Subscriber::findOrFail($request->get('subscriber'));
         $subscriber->update(['email_verified_at' => now()]);
         return $subscriber->email . ' verify';
+    }
+
+    /**
+     * Verify the email
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function export(Request $request)
+    {
+        /* return Excel::download(new SubscribersExport, 'subscribers.csv'); */
+        $fileName = 'tasks.csv';
+        $subscribers = Subscriber::cursor();
+
+        $headers = array(
+            "Content-type"        => "text/csv",
+            "Content-Disposition" => "attachment; filename=$fileName",
+            "Pragma"              => "no-cache",
+            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
+            "Expires"             => "0"
+        );
+
+        $columns = array('id', 'firstname', 'lastname', 'email');
+
+        $callback = function() use($subscribers, $columns) {
+            $file = fopen('php://output', 'w');
+            fputcsv($file, $columns);
+
+            foreach ($subscribers as $subscriber) {
+                $row['id']  = $subscriber->id;
+                $row['firstname']  = $subscriber->firstname;
+                $row['lastname']    = $subscriber->lastname;
+                $row['email']    = $subscriber->email;
+
+                fputcsv($file, array($row['id'], $row['firstname'], $row['lastname'], $row['email']));
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
     }
 
     /**
