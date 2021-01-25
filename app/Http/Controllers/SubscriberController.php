@@ -61,8 +61,7 @@ class SubscriberController extends Controller
      */
     public function export(Request $request)
     {
-        /* return Excel::download(new SubscribersExport, 'subscribers.csv'); */
-        $fileName = 'tasks.csv';
+        $fileName = 'subscribers.csv';
         $subscribers = Subscriber::cursor();
 
         $headers = array(
@@ -73,19 +72,23 @@ class SubscriberController extends Controller
             "Expires"             => "0"
         );
 
-        $columns = array('id', 'firstname', 'lastname', 'email');
+        $columns = ['id', 'firstname', 'lastname', 'email', 'birthday', 'city', 'country'];
 
         $callback = function() use($subscribers, $columns) {
             $file = fopen('php://output', 'w');
             fputcsv($file, $columns);
 
             foreach ($subscribers as $subscriber) {
-                $row['id']  = $subscriber->id;
-                $row['firstname']  = $subscriber->firstname;
-                $row['lastname']    = $subscriber->lastname;
-                $row['email']    = $subscriber->email;
 
-                fputcsv($file, array($row['id'], $row['firstname'], $row['lastname'], $row['email']));
+                fputcsv($file, [
+                    $subscriber->id,
+                    $subscriber->firstname,
+                    $subscriber->lastname,
+                    $subscriber->email,
+                    $subscriber->birthday,
+                    $subscriber->city,
+                    $subscriber->country,
+                ]);
             }
 
             fclose($file);

@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Exports\SubscribersExport;
 use App\Http\Livewire\LandingSubscribers;
 use App\Http\Livewire\SubscribersForm;
 use App\Mail\VerifyEmail;
@@ -11,7 +10,6 @@ use Tests\TestCase;
 use App\Models\Subscriber;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SubscribersTest extends TestCase
 {
@@ -97,11 +95,10 @@ class SubscribersTest extends TestCase
      */
     public function an_admin_can_download_all_subscribers_in_csv()
     {
-        Excel::fake();
         $this->withoutExceptionHandling();
-        Subscriber::factory(2)->create(['firstname' => 'pedeross']);
-        $this->actingAsAdmin()->get('admin/subscribers/download');
-        Excel::assertDownloaded('subscribers.csv');
+        $this->actingAsAdmin()
+             ->get('admin/subscribers/download')
+             ->assertOk();
     }
 
     /**
