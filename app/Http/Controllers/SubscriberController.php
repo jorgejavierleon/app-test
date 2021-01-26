@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Exports\SubscribersExport;
 use App\Models\Subscriber;
+use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\Request;
-use Maatwebsite\Excel\Facades\Excel;
 
 class SubscriberController extends Controller
 {
@@ -41,10 +41,33 @@ class SubscriberController extends Controller
     }
 
     /**
-     * Verify the email
+     * Store the subscriber via api request
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $this->authorizeToken($request);
+        $this->validate($request, Subscriber::$rules);
+
+        Subscriber::create([
+            'firstname' => $request->get('firstname'),
+            'lastname' => $request->get('lastname'),
+            'email' => $request->get('email'),
+            'birthday' => $request->get('birthday'),
+            'city' => $request->get('city'),
+            'country' => $request->get('country'),
+        ]);
+        return response()->json([
+            'created' => true,
+        ], 201);
+    }
+
+    /**
+     * Verify the email
+     *
+     * @param  \Illuminate\Http\Request  $request
      */
     public function verifyEmail(Request $request)
     {
@@ -55,11 +78,9 @@ class SubscriberController extends Controller
 
     /**
      * Verify the email
-     *
-     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function export(Request $request)
+    public function export()
     {
         $fileName = 'subscribers.csv';
         $subscribers = Subscriber::cursor();
@@ -98,13 +119,13 @@ class SubscriberController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Validate the api token 
      */
-    public function destroy($id)
+    public function authorizeToken(Request $request)
     {
-        //
+        if(!User::where('api_token',  $request->bearerToken())->exists()){
+            throw new AuthenticationException();
+        };
+        return;
     }
 }

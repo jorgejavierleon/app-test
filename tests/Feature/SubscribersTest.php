@@ -8,6 +8,7 @@ use App\Mail\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 use App\Models\Subscriber;
+use App\Models\User;
 use Illuminate\Support\Facades\Mail;
 use Livewire\Livewire;
 
@@ -142,4 +143,32 @@ class SubscribersTest extends TestCase
 
         $this->assertTrue($subscriber->fresh()->hasVerifiedEmail());
     }
+
+    /**
+     * @test
+     */
+    public function it_sotres_subscribers_via_api()
+    {
+        $this->withoutExceptionHandling();
+        $subscriber = Subscriber::factory()->make();
+        $data = [
+            'firstname' => $subscriber->firstname,
+            'lastname' => $subscriber->lastname,
+            'email' => $subscriber->email,
+            'birthday' => $subscriber->birthday,
+            'city' => $subscriber->city,
+            'country' => $subscriber->country,
+        ];
+        $user = User::factory()->create();
+        $headers = [
+            'Authorization' => 'Bearer '. $user->api_token,
+        ];
+        $response = $this->postJson('/api/subscribers', $data, $headers);
+        $response
+            ->assertStatus(201)
+            ->assertJson(['created' => true]);
+
+        $this->assertTrue(Subscriber::whereEmail($subscriber->email)->exists());
+    }
+
 }

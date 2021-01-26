@@ -13,10 +13,10 @@
 - [x] Do the authentication process
 - [x] Admin layout
 - [x] Manage subscribers with CRUD in the admin panel
-- [] Import and export csv of users in admin panel
-- [] Import and export csv via cli
-- [] Add support for heavy load with PHP generators lazycollections
-- [] Make and API for the users resource
+- [x] Export csv of subscribers in admin panel
+- [x] Import csv via cli
+- [x] Add support for heavy load with PHP generators lazycollections
+- [x] Make and API endpoint to store subscribers
 - [] Document the api with postmant
 - [] Add meta data to user model for custom fields
 - [] Add CRUD for products (optional)
@@ -31,4 +31,6 @@
 - The seeders run in 44 seconds and create 300.000 subscribers
 - To see the verification email for the first subscriber in DB go to /mailable
 - For the queue jobs I'm using predis. It needs to be installed in order to run the worker with php artisan horizon
+- To import subscriber via csv you neet to put the file in /storage/app/subscribers.csv. Right now the app chunks the file in groups of 600 to do the insrts at a time
+    - The Api endpoint for creating subscribers requires token bearer authentication. The token is in the database seeder.
 

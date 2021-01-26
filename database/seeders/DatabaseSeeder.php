@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
         \App\Models\User::factory()->create([
             'name' => 'admin',
             'email' => 'admin@example.com',
-            'password' => bcrypt('123456')
+            'password' => bcrypt('123456'),
+            'api_token' => 'siExyCGoRW8QD1pljDU5E1FWBNeRhEv5QJPsrmj0Szq3jBtZz95G8uyVDjMI'
         ]);
         $this->call(SubscriberSeeder::class);
     }

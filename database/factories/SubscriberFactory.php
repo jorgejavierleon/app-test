@@ -25,7 +25,7 @@ class SubscriberFactory extends Factory
             'firstname' => $this->faker->firstName,
             'lastname' => $this->faker->lastName,
             'email' => $this->faker->unique()->safeEmail,
-            'email_verified_at' => $this->faker->dateTime,
+            'email_verified_at' => null,
             'birthday' => $this->faker->date(),
             'city' => $this->faker->city,
             'country' => $this->faker->country
