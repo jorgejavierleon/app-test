@@ -17,20 +17,62 @@
 - [x] Import csv via cli
 - [x] Add support for heavy load with PHP generators lazycollections
 - [x] Make and API endpoint to store subscribers
-- [] Document the api with postmant
-- [] Add meta data to user model for custom fields
-- [] Add CRUD for products (optional)
 - [x] Make the website 
 - [x] Make the subscription endpoint
 - [x] Make the validation email template
 - [x] Send email in a queue job with redis
+- [x] Add meta data to user model for custom fields 
+- [] Add CRUD for products (optional)
 - [] Documentation to run the app
 - [] Documentations of work done
+- [] Document the api with postmant
 
 ## Info
-- The seeders run in 44 seconds and create 300.000 subscribers
-- To see the verification email for the first subscriber in DB go to /mailable
+### Fake data
+The app have seeders that poblate the database with 300.000 fake subscribers. 
+Depending on the enviroment that run the seeders, the operation may take a while. 
+In my machine it took about 45 seconds to complete the oepretation.
+
+### Emails
+- To see the verification email that the apps generates when a subscriber register, go to /mailable
 - For the queue jobs I'm using predis. It needs to be installed in order to run the worker with php artisan horizon
 - To import subscriber via csv you neet to put the file in /storage/app/subscribers.csv. Right now the app chunks the file in groups of 600 to do the insrts at a time
     - The Api endpoint for creating subscribers requires token bearer authentication. The token is in the database seeder.
+This is a cURL example of a post to the api
+`curl --location --request POST 'http://synolia.test/api/subscribers?firstname=Pedro&lastname=Perez&email=pedro3@example.com&city=Caracas&country=Chile&birthday=1982-03-23' \
+--header 'Authorization: Bearer siExyCGoRW8QD1pljDU5E1FWBNeRhEv5QJPsrmj0Szq3jBtZz95G8uyVDjMI'`
+With that petition you should get this 201 response 
+`{
+    "created": true,
+    "data": {
+        "firstname": "Pedro",
+        "lastname": "Perez",
+        "email": "pedro3@example.com",
+        "birthday": "1982-03-23",
+        "city": "Caracas",
+        "country": "Chile",
+        "updated_at": "2021-01-26T11:46:00.000000Z",
+        "created_at": "2021-01-26T11:46:00.000000Z",
+        "id": 300003
+    }
+}`
+
+if the request dont pass validation you should get something like this 422 response
+`{
+    "message": "The given data was invalid.",
+    "errors": {
+        "email": [
+            "The email has already been taken."
+        ],
+        "city": [
+            "The city field is required."
+        ]
+    }
+}`
+
+### Meta fields for Reusanility
+For the user to be able to add custom fields to the subscribers, or any other model, I created a Trait `HasMeta` 
+that manage the relation between the models and a meta table. The meta table have fields for key and value 
+and a foreign key constraint to the model id. In a patter similar to variuos CMS like wordpress.
+
 

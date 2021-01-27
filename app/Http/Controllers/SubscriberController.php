@@ -51,7 +51,7 @@ class SubscriberController extends Controller
         $this->authorizeToken($request);
         $this->validate($request, Subscriber::$rules);
 
-        Subscriber::create([
+        $subscriber = Subscriber::create([
             'firstname' => $request->get('firstname'),
             'lastname' => $request->get('lastname'),
             'email' => $request->get('email'),
@@ -61,6 +61,7 @@ class SubscriberController extends Controller
         ]);
         return response()->json([
             'created' => true,
+            'data' => $subscriber
         ], 201);
     }
 

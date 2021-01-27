@@ -171,4 +171,22 @@ class SubscribersTest extends TestCase
         $this->assertTrue(Subscriber::whereEmail($subscriber->email)->exists());
     }
 
+
+    /**
+     * @test
+     */
+    public function it_can_have_meta_values()
+    {
+        $this->withoutExceptionHandling();
+        $subscriber = Subscriber::factory()->create();
+
+        $subscriber->updateOrCreateMeta('age', '32');
+        $this->assertTrue($subscriber->hasMetas());
+        $this->assertEquals('32', $subscriber->getMeta('age'));
+
+        $subscriber->deleteMeta('age');
+        
+        $this->assertFalse($subscriber->hasMetas());
+    }
+
 }
