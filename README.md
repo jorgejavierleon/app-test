@@ -28,8 +28,13 @@
 - [] Document the api with postmant
 
 ## Info
-- The seeders run in 44 seconds and create 300.000 subscribers
-- To see the verification email for the first subscriber in DB go to /mailable
+### Fake data
+The app have seeders that poblate the database with 300.000 fake subscribers. 
+Depending on the enviroment that run the seeders, the operation may take a while. 
+In my machine it took about 45 seconds to complete the oepretation.
+
+### Emails
+- To see the verification email that the apps generates when a subscriber register, go to /mailable
 - For the queue jobs I'm using predis. It needs to be installed in order to run the worker with php artisan horizon
 - To import subscriber via csv you neet to put the file in /storage/app/subscribers.csv. Right now the app chunks the file in groups of 600 to do the insrts at a time
     - The Api endpoint for creating subscribers requires token bearer authentication. The token is in the database seeder.
@@ -64,3 +69,10 @@ if the request dont pass validation you should get something like this 422 respo
         ]
     }
 }`
+
+### Meta fields for Reusanility
+For the user to be able to add custom fields to the subscribers, or any other model, I created a Trait `HasMeta` 
+that manage the relation between the models and a meta table. The meta table have fields for key and value 
+and a foreign key constraint to the model id. In a patter similar to variuos CMS like wordpress.
+
+
