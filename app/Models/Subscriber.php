@@ -2,13 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Traits\HasMeta;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
 class Subscriber extends Model
 {
-    use HasFactory;
+    use HasFactory, HasMeta;
 
     protected $guarded = [];
 
