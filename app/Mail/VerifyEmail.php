@@ -31,7 +31,9 @@ class VerifyEmail extends Mailable implements ShouldQueue
      */
     public function build()
     {
-        $url = $this->subscriber->signedVerificationEmailUrl();
-        return $this->markdown('emails.verification', ['url' => $url]);
+        return $this->markdown('emails.verification', [
+            'url' => $this->subscriber->signedVerificationEmailUrl(),
+            'fullname' => $this->subscriber->fullname
+        ]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Exports\ExportSubscribers;
 use App\Models\Subscriber;
 use App\Models\User;
 use Illuminate\Auth\AuthenticationException;
@@ -83,40 +84,8 @@ class SubscriberController extends Controller
      */
     public function export()
     {
-        $fileName = 'subscribers.csv';
-        $subscribers = Subscriber::cursor();
-
-        $headers = array(
-            "Content-type"        => "text/csv",
-            "Content-Disposition" => "attachment; filename=$fileName",
-            "Pragma"              => "no-cache",
-            "Cache-Control"       => "must-revalidate, post-check=0, pre-check=0",
-            "Expires"             => "0"
-        );
-
-        $columns = ['id', 'firstname', 'lastname', 'email', 'birthday', 'city', 'country'];
-
-        $callback = function() use($subscribers, $columns) {
-            $file = fopen('php://output', 'w');
-            fputcsv($file, $columns);
-
-            foreach ($subscribers as $subscriber) {
-
-                fputcsv($file, [
-                    $subscriber->id,
-                    $subscriber->firstname,
-                    $subscriber->lastname,
-                    $subscriber->email,
-                    $subscriber->birthday,
-                    $subscriber->city,
-                    $subscriber->country,
-                ]);
-            }
-
-            fclose($file);
-        };
-
-        return response()->stream($callback, 200, $headers);
+        $exporter = new ExportSubscribers();
+        return $exporter->export();
     }
 
     /**

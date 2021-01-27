@@ -32,8 +32,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 //To see the email tamplate
-Route::get('mailable', function () {
-    $subscriber = Subscriber::first();
+Route::get('mailable/{id}', function ($id) {
+    $subscriber = Subscriber::find($id);
     return new VerifyEmail($subscriber);
 });
 

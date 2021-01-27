@@ -7,7 +7,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Steps
+## Requirements
 - [x] Estimation 
 - [x] Install laravel v.8
 - [x] Do the authentication process
@@ -17,27 +17,64 @@
 - [x] Import csv via cli
 - [x] Add support for heavy load with PHP generators lazycollections
 - [x] Make and API endpoint to store subscribers
-- [x] Make the website 
-- [x] Make the subscription endpoint
+- [x] Make the landing website 
+- [x] Make the subscription form endpoint
 - [x] Make the validation email template
-- [x] Send email in a queue job with redis
-- [x] Add meta data to user model for custom fields 
-- [] Add CRUD for products (optional)
+- [x] Send email in a queue job with redis for performance
+- [x] Add meta tarit for custom fields 
+- [] Add CRUD for products (optional for reusability)
 - [] Documentation to run the app
 - [] Documentations of work done
 - [] Document the api with postmant
 
-## Info
+### Test
+The app has a set of functional test that cover the basic requirements. You can run the suit with `vendor/bin/phpunit`
+To see the tests go to `tests/Features/SubscribersTest.php`
+
 ### Fake data
-The app have seeders that poblate the database with 300.000 fake subscribers. 
+The app have seeders that populate the database with 300.000 fake subscribers.
 Depending on the enviroment that run the seeders, the operation may take a while. 
 In my machine it took about 45 seconds to complete the oepretation.
 
-### Emails
-- To see the verification email that the apps generates when a subscriber register, go to /mailable
-- For the queue jobs I'm using predis. It needs to be installed in order to run the worker with php artisan horizon
-- To import subscriber via csv you neet to put the file in /storage/app/subscribers.csv. Right now the app chunks the file in groups of 600 to do the insrts at a time
-    - The Api endpoint for creating subscribers requires token bearer authentication. The token is in the database seeder.
+You can see the seeders in `database/seeders/DatabaseSeeder.php`. In that file are the credentials for admin pannel
+
+- email: admin@example.com
+- password: 123456
+- api_token: siExyCGoRW8QD1pljDU5E1FWBNeRhEv5QJPsrmj0Szq3jBtZz95G8uyVDjMI
+
+### Email verification
+To see the verification email that the apps generates when a subscriber register, go to /mailable/{id} 
+where 'id' correspond to the id of the subscriber. If the seeds has been run, 'id' could be any number between 1 and 300.000.
+
+The subscriber model has a method to generate a secure signed url, with a expiration time of a day.
+That url is sended in the email and lets the user confirm the email address when he visited that route. This is an example of a url generated
+http://synolia.test/verify?email=ukeebler%40example.net&expires=1611830808&subscriber=178&signature=f35c6bec51a418e46d3ba8ced6764cabb4e43fa01700649f47308c030743a5ea
+if the user change any part of the url, the subscriber id for expample, the signature would be invalidated.
+
+### Performance
+I Think that the most consuming operation in the landing, that could affect the performance in case of a user spike, 
+is the validation email that is send when the user submit the form. To eliminated the impact in performance 
+I configured a queue worker that would do that job in the backgroung. This functionality requires Redis to be installed on the server.
+To start the worker you need to have `php artisan horizon` running in the backgroung, idealy with a supervisor.
+Once it is running, you can monitor the jobs been executed in a dashboard, just go to http://synolia.test/horizon/dashboard/ 
+
+### CLI tool to import subscribers in csv file
+The app has a command to import subscriber from .csv into the database. The command is `php artisan synolia:import` 
+It has to options (`php artisan synolia:import --help`):
+- chunks: The ammount of resources to insert in the database at a time. Defaults to 600
+ if the file have 2000 and you run `php artisan synolia:import --chunks=200` it will perform 10 inserts with 200 subscribers at a time.
+- filename: by default it will look for 'storage/app/subscribers.csv', but you can overwrite the last part `php artisan synolia:import --filename=another.csv`
+It doesn't do validations for the field. I have time only for the happy path, with the subscribers table clean in order to prevent unique email collisions, and with the file that I give as example.
+The file has 300.000 lines. It was generated with the admin dashboard export functionality.
+You can review the command in app/Commmands/ImportSubscribers.php
+
+### Export subscribers
+There is a button in the admin pannel subscribers view to download a csv with all the subscribers.
+The functionality do a forech in chunk to be able to process a large ammount of data without exaustiong the php memory.
+You can see the implementation in app/Exports/ExportSubscribers.php
+
+### Api for subscribers store
+The app expose a endpoint for creating a subscribers by an API. It is protected by a toke authentication. 
 This is a cURL example of a post to the api
 `curl --location --request POST 'http://synolia.test/api/subscribers?firstname=Pedro&lastname=Perez&email=pedro3@example.com&city=Caracas&country=Chile&birthday=1982-03-23' \
 --header 'Authorization: Bearer siExyCGoRW8QD1pljDU5E1FWBNeRhEv5QJPsrmj0Szq3jBtZz95G8uyVDjMI'`

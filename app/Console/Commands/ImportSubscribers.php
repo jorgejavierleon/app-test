@@ -13,7 +13,10 @@ class ImportSubscribers extends Command
      *
      * @var string
      */
-    protected $signature = 'synolia:import';
+    protected $signature = 'synolia:import 
+        { --chunks=600 : Ammount of chunks to divide the files for insert operation }
+        { --filename=subscribers.csv : The name of the file in storage/app }    
+    ';
 
     /**
      * The console command description.
@@ -39,13 +42,18 @@ class ImportSubscribers extends Command
      */
     public function handle()
     {
-        $file_path = storage_path('app/subscribers_large.csv');
+        $filename = $this->option('filename');
+        $file_path = storage_path('app/'.$filename);
         $csv = Reader::createFromPath($file_path);
         $csv->setHeaderOffset(0);
-        $chunks = collect($csv)->chunk(600);
-        $inserts_count = count($csv / 600);
+
+        $chunk_number = $this->option('chunks');
+        $chunks = collect($csv)->chunk($chunk_number);
+
+        $inserts_count = count($csv) / $chunk_number;
         $bar = $this->output->createProgressBar($inserts_count);
         $bar->start();
+
         foreach ($chunks as $chunk) {
             DB::table('subscribers')->insert($chunk->toArray());
             $bar->advance();
