@@ -1,3 +1,17 @@
+##Table of content
+- [Requirements](#requirements)
+- [Running the app](#running-the-app)
+- [Technology used](#technology-used)
+- [Structure of the app](#structure-of-the-app)
+- [Tests](#tests)
+- [Fake data](#fake-data)
+- [Email verification](#email-verification)
+- [Performance](#performance)
+- [CLI tool to import subscribers from csv file](#cli-tool-to-import-subscribers-from-csv-file)
+- [Export subscribers](#export-subscribers)
+- [API for subscribers store](#api-for-subscribers-store)
+- [Meta fields for Reusability](#meta-fields-for-reusability)
+
 ## Requirements
 - [x] Estimation 
 - [x] Install laravel v.8
