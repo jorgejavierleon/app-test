@@ -1,4 +1,4 @@
-##Table of content
+## Table of content
 - [Requirements](#requirements)
 - [Running the app](#running-the-app)
 - [Technology used](#technology-used)
